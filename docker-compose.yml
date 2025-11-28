@@ -63,8 +63,8 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      POSTGRES_PASSWORD: '${DB_PASSWD:-postgres}'
-      POSTGRES_USER: '${DB_USER:-postgres}'
+      POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
+      POSTGRES_USER: '${POSTGRES_USER:-postgres}'
       POSTGRES_DB: '${DB_NAME:-authentik}'
     volumes:
       - 'postgres-db:/var/lib/postgresql/data'
