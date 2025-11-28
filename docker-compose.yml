@@ -15,7 +15,7 @@ services:
       - '${ROMM_FRONTEND_PORT:-5174}:5173'
       - '8443:8443'
       - '${DEV_PORT:-5000}:5000'
-    volumes:
+    # volumes:
       # - './backend:/app/backend'
       # - /app/backend/romm_mock
       # - './frontend:/app/frontend'
