@@ -1,35 +1,28 @@
 services:
-  romm-dev:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: romm-dev
-    env_file: .env
+  romm:
+    image: rommapp/romm:latest
+    container_name: romm
+    restart: unless-stopped
     environment:
+      - DB_HOST=romm-db-dev
+      - DB_NAME=${DB_NAME:-romm}
+      - DB_USER=${DB_USER:-romm}
+      - DB_PASSWD=${DB_PASSWD:-romm}
       - REDIS_HOST=romm-valkey-dev
-      - 'DB_HOST=${DB_HOST:-romm-db-dev}'
-      - ROMM_BASE_PATH=/app/romm
+      - REDIS_PORT=6379
+      # Production uses port 8080 internally
+      - ROMM_PORT=8080 
     ports:
-      - '3000:3000'
-      # MODIFIED: Uses the variable ROMM_FRONTEND_PORT (defaulting to 5174) to avoid port 5173 conflict
-      - '${ROMM_FRONTEND_PORT:-5174}:5173'
-      - '8443:8443'
-      - '${DEV_PORT:-5000}:5000'
-    # volumes:
-      # - './backend:/app/backend'
-      # - /app/backend/romm_mock
-      # - './frontend:/app/frontend'
-      # - /app/frontend/node_modules
-      # - /app/frontend/dist
-      # - './romm_mock:/app/romm'
-      # - '~/.vite-plugin-mkcert:/app/.vite-plugin-mkcert'
+      # Maps your variable (default 5174) to the internal 8080
+      - '${ROMM_FRONTEND_PORT:-5174}:8080'
+    volumes:
+      # Where your games go. You can change this to a host path later if needed.
+      - romm-library:/romm/library
+      - romm-assets:/romm/assets
+      - romm-config:/romm/config
     depends_on:
       - romm-db-dev
       - romm-valkey-dev
-      - romm-postgres-dev
-    command: '/bin/bash -c "cd /app && bash"'
-    stdin_open: true
-    tty: true
 
   romm-db-dev:
     image: 'mariadb:11.3.2'
@@ -43,19 +36,12 @@ services:
       - 'MARIADB_PASSWORD=${DB_PASSWD:-romm}'
     volumes:
       - 'romm-db-dev:/var/lib/mysql'
-    # REMOVED EXTERNAL PORTS to prevent conflicts. 
-    # romm-dev can still reach this via internal docker network.
-    # ports:
-    #   - '3306:3306'
 
   romm-valkey-dev:
     image: 'valkey/valkey:8'
     container_name: romm-valkey-dev
     restart: unless-stopped
     env_file: .env
-    # REMOVED EXTERNAL PORTS to prevent conflicts.
-    # ports:
-    #   - '${REDIS_PORT:-6379}:6379'
 
   romm-postgres-dev:
     image: 'postgres:16-alpine'
@@ -63,15 +49,11 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
-      # These must use POSTGRES_* variables or default to 'postgres'
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
       POSTGRES_USER: '${POSTGRES_USER:-postgres}'
       POSTGRES_DB: '${POSTGRES_DB:-authentik}'
     volumes:
       - 'postgres-db:/var/lib/postgresql/data'
-    # REMOVED EXTERNAL PORTS to prevent conflicts.
-    # ports:
-    #   - '5432:5432'
 
   romm-authentik-server:
     image: 'ghcr.io/goauthentik/server:2024.10.4'
@@ -123,3 +105,6 @@ volumes:
   postgres-db: null
   authentik-media: null
   authentik-templates: null
+  romm-library: null
+  romm-assets: null
+  romm-config: null
