@@ -12,10 +12,10 @@ services:
       - DB_HOST=${DB_HOST:-romm-db-dev}
       - ROMM_BASE_PATH=/app/romm
     ports:
-      - "3000:3000" # Vite dev server (custom)
-      - "5173:5173" # Vite dev server (default)
-      - "8443:8443" # HTTPS dev server
-      - "${DEV_PORT:-5000}:5000" # Backend API
+      - '3000:3000'
+      - '${ROMM_FRONTEND_PORT:-5174}:5173'  <-- Now it looks for a variable
+      - '8443:8443'
+      - '${DEV_PORT:-5000}:5000'
     volumes:
       - ./backend:/app/backend
       - /app/backend/romm_mock # Empty directory
