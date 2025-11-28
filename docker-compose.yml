@@ -63,9 +63,10 @@ services:
     restart: unless-stopped
     env_file: .env
     environment:
+      # These must use POSTGRES_* variables or default to 'postgres'
       POSTGRES_PASSWORD: '${POSTGRES_PASSWORD:-postgres}'
       POSTGRES_USER: '${POSTGRES_USER:-postgres}'
-      POSTGRES_DB: '${DB_NAME:-authentik}'
+      POSTGRES_DB: '${POSTGRES_DB:-authentik}'
     volumes:
       - 'postgres-db:/var/lib/postgresql/data'
     # REMOVED EXTERNAL PORTS to prevent conflicts.
